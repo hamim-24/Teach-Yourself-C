@@ -1,12 +1,20 @@
 #include<stdio.h>
-#include<String.h>
-#include<stdlib.h>
+#include<string.h>
+#include <stdlib.h>
 #define MAX 100
+
+struct address{
+    char street[40];
+    char city[40];
+    char state[3];
+    char zip[12];
+};
 
 struct phone_type {
     char name[40];
     int areacode;
     char number[9];
+    struct address addr;
 }phone[MAX];
 
 int loc=0;
@@ -61,7 +69,16 @@ void enter(void)
             phone[loc].areacode=atoi(temp);
             printf("\nEnter number:");
             gets(phone[loc].number);
-        }
+
+            printf("\nEnter Street address:");
+            gets(phone[loc].addr.street);
+            printf("\nEnter city:");
+            gets(phone[loc].addr.city);
+            printf("\nEnter State:");
+            gets(phone[loc].addr.state);
+            printf("\nEnter zip code:");
+            gets(phone[loc].addr.zip);
+            }
     }
 }
 void find(void)
@@ -73,14 +90,16 @@ void find(void)
     if(!*name) return;
     for(i=0;i<100;i++)
     {
-        if(!strcmp(name,phone[i].name))
+        if(!strcmp(name,phone[i].name)) {
             printf("%s (%d) %s\n ",phone[i].name,phone[i].areacode,phone[i].number);
+            printf("%s\n %s %s %s\n ",phone[i].addr.street,phone[i].addr.city,phone[i].addr.state,phone[i].addr.zip);
+        }
     }
 }
 void load(void)
 {
     FILE *fp;
-    if((fp=fopen("phone","r"))==NULL)
+    if((fp=fopen("phone","rb"))==NULL)
     {
         printf("Cannot open file\n");
         exit(1);
@@ -88,7 +107,7 @@ void load(void)
     loc=0;
     while(!feof(fp))
     {
-        fscanf(fp,"%s%d%s",&phone[loc].name,&phone[loc].areacode,&phone[loc].number);
+        fread(&phone[loc],sizeof phone[loc],1,fp);
         loc++;
     }
     fclose(fp);
@@ -98,14 +117,14 @@ void save(void)
 {
     FILE *fp;
     int i;
-    if((fp=fopen("phone","w"))==NULL)
+    if((fp=fopen("phone","wb"))==NULL)
     {
         printf("Cannot open file\n");
         exit(1);
     }
     for(i=0;i<loc;i++)
     {
-        fprintf(fp,"%s (%d) %s\n ",phone[i].name,phone[i].areacode,phone[i].number);
+        fwrite(&phone[loc],sizeof phone[i],1,fp);
     }
     fclose(fp);
 }
